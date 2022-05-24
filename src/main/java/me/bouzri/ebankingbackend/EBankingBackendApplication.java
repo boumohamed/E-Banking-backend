@@ -1,20 +1,23 @@
 package me.bouzri.ebankingbackend;
 
-import me.bouzri.ebankingbackend.entities.AccountOperation;
-import me.bouzri.ebankingbackend.entities.CurrentAccount;
-import me.bouzri.ebankingbackend.entities.Customer;
-import me.bouzri.ebankingbackend.entities.SavingAccount;
+import me.bouzri.ebankingbackend.entities.*;
 import me.bouzri.ebankingbackend.enums.AccountStatus;
 import me.bouzri.ebankingbackend.enums.OperationType;
+import me.bouzri.ebankingbackend.exceptions.BalanceNotSufficientException;
+import me.bouzri.ebankingbackend.exceptions.BankAccountNotFoundException;
+import me.bouzri.ebankingbackend.exceptions.CusttomerNotFoundException;
 import me.bouzri.ebankingbackend.repositories.AccountOperationRepository;
 import me.bouzri.ebankingbackend.repositories.BankAccountRepository;
 import me.bouzri.ebankingbackend.repositories.CustomerRepository;
+import me.bouzri.ebankingbackend.services.BankAccountService;
+import me.bouzri.ebankingbackend.services.BankService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -25,8 +28,8 @@ public class EBankingBackendApplication {
         SpringApplication.run(EBankingBackendApplication.class, args);
     }
 
-    @Bean
-    CommandLineRunner start(CustomerRepository customerRepository,
+    //@Bean
+    CommandLineRunner start1(CustomerRepository customerRepository,
                             BankAccountRepository bankAccountRepository,
                             AccountOperationRepository accountOperationRepository)
     {
@@ -54,7 +57,7 @@ public class EBankingBackendApplication {
                 sa.setCustomer(c);
                 sa.setStatus(AccountStatus.CREATED);
                 sa.setCreateDate(new Date());
-                sa.setInvestRate(2.5);
+                sa.setInterestRate(2.5);
 
                 bankAccountRepository.save(sa);
             });
@@ -70,6 +73,42 @@ public class EBankingBackendApplication {
                     accountOperationRepository.save(ao);
                 }
 
+            });
+
+
+
+        };
+    };
+
+    @Bean
+    CommandLineRunner start2(BankAccountService bankAccountService)
+    {
+        return args -> {
+            Stream.of("Mohamed", "Amina").forEach(n -> {
+                Customer c = new Customer();
+                c.setNom(n);
+                c.setEmail(n+"@gmail.com");
+                bankAccountService.saveCustomer(c);
+            });
+
+            bankAccountService.listCustomers().forEach(c -> {
+                try {
+                    bankAccountService.saveCurrentBankAccount(Math.random() * 30000, 7000, c.getId());
+                    bankAccountService.saveSavingBankAccount(Math.random() * 100000, 2.7, c.getId());
+                    List<BankAccount> accounts = bankAccountService.AccountList();
+                    for (BankAccount bankAccount: accounts)
+                    {
+                        for (int i = 0; i < 5; i++ )
+                        {
+                            bankAccountService.credit(bankAccount.getId(), 10000 + Math.random() * 600000, "Credit");
+                            bankAccountService.debit(bankAccount.getId(), 1000 + Math.random() * 5000, "Debit");
+                        }
+                    }
+
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             });
 
 
