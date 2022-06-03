@@ -13,8 +13,8 @@ import java.util.Collection;
 public class Customer {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String Nom;
-    private String Email;
+    private String nom;
+    private String email;
 
     @OneToMany(mappedBy = "customer")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
