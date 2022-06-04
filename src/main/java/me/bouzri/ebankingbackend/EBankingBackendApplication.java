@@ -1,16 +1,17 @@
 package me.bouzri.ebankingbackend;
 
+import me.bouzri.ebankingbackend.dtos.BankAccountDTO;
+import me.bouzri.ebankingbackend.dtos.CurrentAccountDTO;
+import me.bouzri.ebankingbackend.dtos.SavingAccountDTO;
 import me.bouzri.ebankingbackend.entities.*;
 import me.bouzri.ebankingbackend.enums.AccountStatus;
 import me.bouzri.ebankingbackend.enums.OperationType;
-import me.bouzri.ebankingbackend.exceptions.BalanceNotSufficientException;
-import me.bouzri.ebankingbackend.exceptions.BankAccountNotFoundException;
-import me.bouzri.ebankingbackend.exceptions.CusttomerNotFoundException;
+import me.bouzri.ebankingbackend.mappers.BankAccountMapperImpl;
 import me.bouzri.ebankingbackend.repositories.AccountOperationRepository;
 import me.bouzri.ebankingbackend.repositories.BankAccountRepository;
 import me.bouzri.ebankingbackend.repositories.CustomerRepository;
 import me.bouzri.ebankingbackend.services.BankAccountService;
-import me.bouzri.ebankingbackend.services.BankService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,6 +25,8 @@ import java.util.stream.Stream;
 @SpringBootApplication
 public class EBankingBackendApplication {
 
+    @Autowired
+    private BankAccountMapperImpl mapper;
     public static void main(String[] args) {
         SpringApplication.run(EBankingBackendApplication.class, args);
     }
@@ -84,32 +87,38 @@ public class EBankingBackendApplication {
     CommandLineRunner start2(BankAccountService bankAccountService)
     {
         return args -> {
-            Stream.of("Mohamed", "Amina").forEach(n -> {
+            Stream.of("Mohamed", "Amina", "Ali").forEach(n -> {
                 Customer c = new Customer();
                 c.setNom(n);
                 c.setEmail(n+"@gmail.com");
-                bankAccountService.saveCustomer(c);
+                bankAccountService.saveCustomer(mapper.fromCustomer(c));
             });
 
             bankAccountService.listCustomers().forEach(c -> {
                 try {
                     bankAccountService.saveCurrentBankAccount(Math.random() * 30000, 7000, c.getId());
                     bankAccountService.saveSavingBankAccount(Math.random() * 100000, 2.7, c.getId());
-                    List<BankAccount> accounts = bankAccountService.AccountList();
-                    for (BankAccount bankAccount: accounts)
-                    {
-                        for (int i = 0; i < 5; i++ )
-                        {
-                            bankAccountService.credit(bankAccount.getId(), 10000 + Math.random() * 600000, "Credit");
-                            bankAccountService.debit(bankAccount.getId(), 1000 + Math.random() * 5000, "Debit");
-                        }
-                    }
 
                 }
                 catch (Exception e){
                     e.printStackTrace();
                 }
             });
+            List<BankAccountDTO> accounts = bankAccountService.AccountList();
+            for (BankAccountDTO bankAccount: accounts)
+            {
+                for (int i = 0; i < 5; i++ )
+                {
+                    String id;
+                    if (bankAccount instanceof SavingAccountDTO)
+                        id = ((SavingAccountDTO) bankAccount).getId();
+                    else
+                        id = ((CurrentAccountDTO) bankAccount).getId();
+
+                    bankAccountService.credit(id, 10000 + Math.random() * 600000, "Credit");
+                    bankAccountService.debit(id, 1000 + Math.random() * 5000, "Debit");
+                }
+            }
 
 
 
