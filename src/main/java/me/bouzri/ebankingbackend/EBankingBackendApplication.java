@@ -115,8 +115,8 @@ public class EBankingBackendApplication {
                     else
                         id = ((CurrentAccountDTO) bankAccount).getId();
 
-                    bankAccountService.credit(id, 10000 + Math.random() * 600000, "Credit");
-                    bankAccountService.debit(id, 1000 + Math.random() * 5000, "Debit");
+                    bankAccountService.credit(id, 10000 + Math.random() * 600000, "Credit operation");
+                    bankAccountService.debit(id, 1000 + Math.random() * 5000, "Debit operation");
                 }
             }
 
