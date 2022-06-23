@@ -37,7 +37,7 @@ public class EBankingBackendApplication {
                             AccountOperationRepository accountOperationRepository)
     {
         return args -> {
-            Stream.of("Mohamed", "Amina").forEach(n -> {
+            Stream.of("Mohamed Bouzri", "Amina Assri").forEach(n -> {
                 Customer c = new Customer();
                 c.setNom(n);
                 c.setEmail(n+"@gmail.com");
@@ -87,10 +87,10 @@ public class EBankingBackendApplication {
     CommandLineRunner start2(BankAccountService bankAccountService)
     {
         return args -> {
-            Stream.of("Mohamed", "Amina", "Ali").forEach(n -> {
+            Stream.of("Mohamed Bouzri", "Amina Assri", "Ali Amrani").forEach(n -> {
                 Customer c = new Customer();
                 c.setNom(n);
-                c.setEmail(n+"@gmail.com");
+                c.setEmail(n.replace(" ", "")+"@gmail.com");
                 bankAccountService.saveCustomer(mapper.fromCustomer(c));
             });
 

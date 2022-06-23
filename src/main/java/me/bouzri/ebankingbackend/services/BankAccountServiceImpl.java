@@ -1,7 +1,6 @@
 package me.bouzri.ebankingbackend.services;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.bouzri.ebankingbackend.dtos.*;
 import me.bouzri.ebankingbackend.entities.*;
@@ -173,7 +172,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     public List<BankAccountDTO> AccountList()
     {
          List<BankAccount> list = bankAccountRepository.findAll();
-        List<BankAccountDTO> collectedList = list.stream().map(a -> {
+         List<BankAccountDTO> collectedList = list.stream().map(a -> {
             if (a instanceof SavingAccount) {
                 SavingAccount savingAccount = (SavingAccount) a;
                 return dtoMapper.fromSavingAccount(savingAccount);
@@ -232,5 +231,27 @@ public class BankAccountServiceImpl implements BankAccountService {
             accountHistoryDTO.setType("Current Account");
 
         return accountHistoryDTO;
+    }
+
+    @Override
+    public List<BankAccountDTO> customerAccounts(Long customerId)
+    {
+        //Page<BankAccount> bankAccounts = bankAccountRepository.findByCustomerId(customerId, PageRequest.of(page, size));
+
+
+
+        List<BankAccount> list = bankAccountRepository.findByCustomerId(customerId);
+        List<BankAccountDTO> collectedList = list.stream().map(a -> {
+            if (a instanceof SavingAccount) {
+                SavingAccount savingAccount = (SavingAccount) a;
+                return dtoMapper.fromSavingAccount(savingAccount);
+            } else {
+                CurrentAccount currentAccount = (CurrentAccount) a;
+                return dtoMapper.fromCurrentAccount(currentAccount);
+            }
+
+        }).collect(Collectors.toList());
+
+        return collectedList;
     }
 }
