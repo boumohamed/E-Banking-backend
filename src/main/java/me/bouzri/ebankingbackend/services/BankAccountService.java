@@ -18,18 +18,14 @@ public interface BankAccountService {
     CurrentAccountDTO saveCurrentBankAccount(double initSolde, double overDraft, Long customerId) throws CustomerNotFoundException;
     SavingAccountDTO saveSavingBankAccount(double initSolde, double interestRate, Long customerId) throws CustomerNotFoundException;
     List<CustomerDTO> listCustomers();
-
-
     List<CustomerDTO> searcheCustomers(String keyWord);
-
     BankAccountDTO getAccount(String accountId) throws BankAccountNotFoundException;
     List<BankAccountDTO> AccountList();
     CustomerDTO getCustomer(Long id) throws CustomerNotFoundException;
     void debit(String accountId, double amount, String desc) throws BankAccountNotFoundException, BalanceNotSufficientException;
     void credit(String accountId, double amount, String desc) throws BalanceNotSufficientException, BankAccountNotFoundException;
     void tranfser(String accountIdS, String accountIdD, double amount, String desc) throws BankAccountNotFoundException, BalanceNotSufficientException;
-
     List<AccountOperationDTO> accountHistory(String id);
-
     AccountHistoryDTO getAccountHistory(String id, int page, int size) throws BankAccountNotFoundException;
+    List<BankAccountDTO> customerAccounts(Long customerId);
 }

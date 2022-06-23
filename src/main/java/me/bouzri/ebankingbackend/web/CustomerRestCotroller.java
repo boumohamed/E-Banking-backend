@@ -2,7 +2,9 @@ package me.bouzri.ebankingbackend.web;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.bouzri.ebankingbackend.dtos.BankAccountDTO;
 import me.bouzri.ebankingbackend.dtos.CustomerDTO;
+import me.bouzri.ebankingbackend.entities.BankAccount;
 import me.bouzri.ebankingbackend.entities.Customer;
 import me.bouzri.ebankingbackend.exceptions.CustomerNotFoundException;
 import me.bouzri.ebankingbackend.services.BankAccountService;
@@ -52,5 +54,10 @@ public class CustomerRestCotroller {
     public void deleteCustomer(@PathVariable(name = "id") Long id)
     {
         bankAccountService.deleteCustomer(id);
+    }
+
+    @GetMapping("/customers/{id}/accounts")
+    public List<BankAccountDTO> getCustomerAccounts(@PathVariable(name = "id") Long id) {
+        return bankAccountService.customerAccounts(id);
     }
 }

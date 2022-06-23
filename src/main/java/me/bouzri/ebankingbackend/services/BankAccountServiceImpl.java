@@ -1,7 +1,6 @@
 package me.bouzri.ebankingbackend.services;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.bouzri.ebankingbackend.dtos.*;
 import me.bouzri.ebankingbackend.entities.*;
@@ -173,7 +172,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     public List<BankAccountDTO> AccountList()
     {
          List<BankAccount> list = bankAccountRepository.findAll();
-        List<BankAccountDTO> collectedList = list.stream().map(a -> {
+         List<BankAccountDTO> collectedList = list.stream().map(a -> {
             if (a instanceof SavingAccount) {
                 SavingAccount savingAccount = (SavingAccount) a;
                 return dtoMapper.fromSavingAccount(savingAccount);
@@ -216,7 +215,7 @@ public class BankAccountServiceImpl implements BankAccountService {
         BankAccount account = bankAccountRepository.findById(id).orElse(null);
         if (account == null) throw new BankAccountNotFoundException("Account Not Found !");
 
-        Page<AccountOperation> accountOperations = accountOperationRepository.findByBankAccountId(id, PageRequest.of(page, size));
+        Page<AccountOperation> accountOperations = accountOperationRepository.findByBankAccountIdOrderByDateOperationDesc(id, PageRequest.of(page, size));
         AccountHistoryDTO accountHistoryDTO = new AccountHistoryDTO();
         List<AccountOperationDTO> operationDTOS = accountOperations.getContent().stream().map(o ->
                 dtoMapper.fromAccounOperation(o)).collect(Collectors.toList());
@@ -232,5 +231,25 @@ public class BankAccountServiceImpl implements BankAccountService {
             accountHistoryDTO.setType("Current Account");
 
         return accountHistoryDTO;
+    }
+
+    @Override
+    public List<BankAccountDTO> customerAccounts(Long customerId)
+    {
+        //Page<BankAccount> bankAccounts = bankAccountRepository.findByCustomerId(customerId, PageRequest.of(page, size));
+        List<BankAccount> list = bankAccountRepository.findByCustomerId(customerId);
+        List<BankAccountDTO> collectedList = list.stream().map(a -> {
+
+            if (a instanceof SavingAccount) {
+                SavingAccount savingAccount = (SavingAccount) a;
+                return dtoMapper.fromSavingAccount(savingAccount);
+            } else {
+                CurrentAccount currentAccount = (CurrentAccount) a;
+                return dtoMapper.fromCurrentAccount(currentAccount);
+            }
+
+        }).collect(Collectors.toList());
+
+        return collectedList;
     }
 }
