@@ -237,11 +237,9 @@ public class BankAccountServiceImpl implements BankAccountService {
     public List<BankAccountDTO> customerAccounts(Long customerId)
     {
         //Page<BankAccount> bankAccounts = bankAccountRepository.findByCustomerId(customerId, PageRequest.of(page, size));
-
-
-
         List<BankAccount> list = bankAccountRepository.findByCustomerId(customerId);
         List<BankAccountDTO> collectedList = list.stream().map(a -> {
+
             if (a instanceof SavingAccount) {
                 SavingAccount savingAccount = (SavingAccount) a;
                 return dtoMapper.fromSavingAccount(savingAccount);
